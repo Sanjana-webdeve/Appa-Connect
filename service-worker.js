@@ -2,7 +2,7 @@ const CACHE_NAME = "appa-connect-v1";
 
 const FILES_TO_CACHE = [
     "./",
-    "./appa-connect.html",
+    "./index.html",
     "./manifest.json"
 ];
 
@@ -62,8 +62,8 @@ self.addEventListener("push", (event) => {
         badge: "./icon-192.png",
         vibrate: [200, 100, 200],
         data: {
-            url: "./appa-connect.html"
-        }
+    url: "./index.html"
+}
     };
 
     event.waitUntil(
