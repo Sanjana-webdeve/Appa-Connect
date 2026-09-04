@@ -462,7 +462,7 @@ async function requestNotificationPermission(){
   The ID is returned by POST /users in http://localhost:8000/docs.
 */
 const APPA_USER_ID = 1;
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = 'https://appa-connect.onrender.com';
 
 function urlBase64ToUint8Array(base64String){
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
