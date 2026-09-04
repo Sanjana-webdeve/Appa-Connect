@@ -1,3 +1,4 @@
+```python
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -6,9 +7,11 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
 from dotenv import load_dotenv
+
 import os
 import json
 import base64
+
 from pywebpush import webpush, WebPushException
 
 from database import (
@@ -19,8 +22,16 @@ from database import (
 )
 
 
+# ============================================================
+# LOAD ENVIRONMENT VARIABLES
+# ============================================================
+
 load_dotenv()
 
+
+# ============================================================
+# FASTAPI APPLICATION
+# ============================================================
 
 app = FastAPI(
     title="Appa Connect API",
@@ -28,9 +39,12 @@ app = FastAPI(
 )
 
 
-# --------------------------------------------------
+# ============================================================
 # CORS
-# --------------------------------------------------
+# ============================================================
+
+# For development this allows your local frontend.
+# We will restrict this to your Netlify URL after deployment.
 
 app.add_middleware(
     CORSMiddleware,
@@ -41,21 +55,71 @@ app.add_middleware(
 )
 
 
-# --------------------------------------------------
-# Configuration
-# --------------------------------------------------
+# ============================================================
+# VAPID CONFIGURATION
+# ============================================================
 
 VAPID_PRIVATE_KEY = os.getenv("VAPID_PRIVATE_KEY")
+
 VAPID_PUBLIC_KEY = os.getenv("VAPID_PUBLIC_KEY")
+
 VAPID_EMAIL = os.getenv(
     "VAPID_EMAIL",
-    "mailto:appa-connect@example.com"
+    "mailto:sajrag05@gmail.com"
 )
 
 
-# --------------------------------------------------
-# Pydantic models
-# --------------------------------------------------
+def get_vapid_private_key():
+    """
+    Returns the VAPID private key.
+
+    Local development:
+        VAPID_PRIVATE_KEY=vapid_private.pem
+
+    Render/production:
+        VAPID_PRIVATE_KEY contains the actual PEM key.
+    """
+
+    if not VAPID_PRIVATE_KEY:
+        raise RuntimeError(
+            "VAPID_PRIVATE_KEY is not configured."
+        )
+
+    # --------------------------------------------------------
+    # CASE 1:
+    # The environment variable contains the actual PEM key.
+    # This is what we will use on Render.
+    # --------------------------------------------------------
+
+    if "BEGIN" in VAPID_PRIVATE_KEY:
+        return VAPID_PRIVATE_KEY
+
+    # --------------------------------------------------------
+    # CASE 2:
+    # The environment variable contains a filename.
+    # This is what we currently use locally.
+    # --------------------------------------------------------
+
+    key_path = VAPID_PRIVATE_KEY
+
+    if not os.path.isabs(key_path):
+        key_path = os.path.join(
+            os.path.dirname(__file__),
+            key_path
+        )
+
+    if not os.path.exists(key_path):
+        raise RuntimeError(
+            f"VAPID private key file not found: {key_path}"
+        )
+
+    with open(key_path, "r", encoding="utf-8") as file:
+        return file.read()
+
+
+# ============================================================
+# PYDANTIC MODELS
+# ============================================================
 
 class UserCreate(BaseModel):
     name: str
@@ -82,9 +146,9 @@ class NotificationRequest(BaseModel):
     body: str
 
 
-# --------------------------------------------------
-# Root
-# --------------------------------------------------
+# ============================================================
+# ROOT
+# ============================================================
 
 @app.get("/")
 def root():
@@ -93,9 +157,9 @@ def root():
     }
 
 
-# --------------------------------------------------
-# Health check
-# --------------------------------------------------
+# ============================================================
+# HEALTH CHECK
+# ============================================================
 
 @app.get("/health")
 def health():
@@ -104,9 +168,9 @@ def health():
     }
 
 
-# --------------------------------------------------
-# Users
-# --------------------------------------------------
+# ============================================================
+# USERS
+# ============================================================
 
 @app.post("/users")
 def create_user(
@@ -153,31 +217,46 @@ def get_users(
     ]
 
 
-# --------------------------------------------------
-# VAPID public key
-# --------------------------------------------------
+# ============================================================
+# VAPID PUBLIC KEY
+# ============================================================
 
 @app.get("/push/public-key")
 def get_public_key():
-    if not VAPID_PRIVATE_KEY:
-        raise HTTPException(
-            status_code=500,
-            detail="VAPID private key is not configured"
-        )
 
     try:
+
         from py_vapid import Vapid
+
         from cryptography.hazmat.primitives.serialization import (
             Encoding,
             PublicFormat
         )
 
-        vapid = Vapid.from_file(VAPID_PRIVATE_KEY)
+        private_key = get_vapid_private_key()
+
+        # ----------------------------------------------------
+        # Load VAPID private key from PEM contents
+        # ----------------------------------------------------
+
+        vapid = Vapid.from_pem(
+            private_key.encode("utf-8")
+        )
+
+        # ----------------------------------------------------
+        # Get the uncompressed EC public key.
+        #
+        # Browser PushManager expects this format.
+        # ----------------------------------------------------
 
         public_key_bytes = vapid.public_key.public_bytes(
             Encoding.X962,
             PublicFormat.UncompressedPoint
         )
+
+        # ----------------------------------------------------
+        # Convert to URL-safe Base64.
+        # ----------------------------------------------------
 
         public_key_base64 = base64.urlsafe_b64encode(
             public_key_bytes
@@ -188,14 +267,19 @@ def get_public_key():
         }
 
     except Exception as e:
+
         raise HTTPException(
             status_code=500,
-            detail=f"Could not generate VAPID public key: {str(e)}"
+            detail=(
+                "Could not generate VAPID public key: "
+                + str(e)
+            )
         )
 
-# --------------------------------------------------
-# Save push subscription
-# --------------------------------------------------
+
+# ============================================================
+# SAVE PUSH SUBSCRIPTION
+# ============================================================
 
 @app.post("/push/subscribe")
 def subscribe(
@@ -203,15 +287,24 @@ def subscribe(
     db: Session = Depends(get_db)
 ):
 
+    # --------------------------------------------------------
+    # Check that the user exists.
+    # --------------------------------------------------------
+
     user = db.query(User).filter(
         User.id == subscription.user_id
     ).first()
 
     if not user:
+
         raise HTTPException(
             status_code=404,
             detail="User not found"
         )
+
+    # --------------------------------------------------------
+    # Check whether this device already exists.
+    # --------------------------------------------------------
 
     existing = db.query(PushSubscription).filter(
         PushSubscription.endpoint == subscription.endpoint
@@ -220,7 +313,9 @@ def subscribe(
     if existing:
 
         existing.user_id = subscription.user_id
+
         existing.p256dh = subscription.p256dh
+
         existing.auth = subscription.auth
 
     else:
@@ -242,15 +337,19 @@ def subscribe(
     }
 
 
-# --------------------------------------------------
-# Send notification
-# --------------------------------------------------
+# ============================================================
+# SEND PUSH NOTIFICATION
+# ============================================================
 
 @app.post("/push/send")
 def send_notification(
     notification: NotificationRequest,
     db: Session = Depends(get_db)
 ):
+
+    # --------------------------------------------------------
+    # Get all devices belonging to this user.
+    # --------------------------------------------------------
 
     subscriptions = db.query(
         PushSubscription
@@ -265,12 +364,35 @@ def send_notification(
             detail="No registered device for this user"
         )
 
+    # --------------------------------------------------------
+    # Notification payload.
+    # --------------------------------------------------------
+
     payload = {
         "title": notification.title,
         "body": notification.body
     }
 
     results = []
+
+    # --------------------------------------------------------
+    # Get private VAPID key.
+    # --------------------------------------------------------
+
+    try:
+
+        private_key = get_vapid_private_key()
+
+    except Exception as e:
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
+
+    # --------------------------------------------------------
+    # Send notification to every registered device.
+    # --------------------------------------------------------
 
     for subscription in subscriptions:
 
@@ -286,8 +408,11 @@ def send_notification(
 
             webpush(
                 subscription_info=push_info,
+
                 data=json.dumps(payload),
-                vapid_private_key=VAPID_PRIVATE_KEY,
+
+                vapid_private_key=private_key,
+
                 vapid_claims={
                     "sub": VAPID_EMAIL
                 }
@@ -304,15 +429,22 @@ def send_notification(
                 "error": str(e)
             })
 
+        except Exception as e:
+
+            results.append({
+                "success": False,
+                "error": str(e)
+            })
+
     return {
         "success": True,
         "results": results
     }
 
 
-# --------------------------------------------------
-# Health reminders
-# --------------------------------------------------
+# ============================================================
+# CREATE HEALTH REMINDER
+# ============================================================
 
 @app.post("/reminders")
 def create_reminder(
@@ -320,15 +452,24 @@ def create_reminder(
     db: Session = Depends(get_db)
 ):
 
+    # --------------------------------------------------------
+    # Check that user exists.
+    # --------------------------------------------------------
+
     user = db.query(User).filter(
         User.id == reminder.user_id
     ).first()
 
     if not user:
+
         raise HTTPException(
             status_code=404,
             detail="User not found"
         )
+
+    # --------------------------------------------------------
+    # Create reminder.
+    # --------------------------------------------------------
 
     new_reminder = HealthReminder(
         user_id=reminder.user_id,
@@ -339,7 +480,9 @@ def create_reminder(
     )
 
     db.add(new_reminder)
+
     db.commit()
+
     db.refresh(new_reminder)
 
     return {
@@ -347,6 +490,10 @@ def create_reminder(
         "message": "Reminder created"
     }
 
+
+# ============================================================
+# GET HEALTH REMINDERS
+# ============================================================
 
 @app.get("/reminders/{user_id}")
 def get_reminders(
@@ -370,3 +517,4 @@ def get_reminders(
         }
         for r in reminders
     ]
+```
