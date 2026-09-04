@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home, from Chennai</title>
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#2B2320;
+    --ink-soft:#5B5048;
+    --paper:#FBF6EC;
+    --paper-dim:#F1E9D8;
+    --marigold:#E8A33D;
+    --marigold-deep:#C9821F;
+    --teal:#1F5C56;
+    --teal-deep:#164740;
+    --rose:#C9667B;
+    --sky:#6E9CC4;
+    --line:rgba(43,35,32,0.14);
+    --bg-1:#FDEBD3; --bg-2:#FCE0C4;
+    --radius-card:3px;
+    --shadow-soft: 0 1px 2px rgba(43,35,32,0.06), 0 6px 18px rgba(43,35,32,0.07);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Work Sans', sans-serif;
+    color:var(--ink);
+    background:linear-gradient(160deg, var(--bg-1), var(--bg-2));
+    min-height:100vh;
+    transition:background 1.2s ease;
+  }
+  body.night{ color:#EFE7DA; }
+  h1,h2,h3,.serif{ font-family:'Fraunces', serif; font-weight:500; letter-spacing:-0.01em; }
+  .app{ max-width:920px; margin:0 auto; padding:18px 16px 90px; }
+  a{ color:inherit; }
+
+  /* Header */
+  .top{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:14px; flex-wrap:wrap;}
+  .greet{ font-size:1.7rem; margin:0; }
+  .greet .heart{ color:var(--rose); }
+  .subline{ margin:2px 0 0; font-size:0.92rem; color:var(--ink-soft); }
+  body.night .subline{ color:#C9BFB0; }
+  .editToggle{
+    border:1px solid var(--line); background:rgba(255,255,255,0.5); color:var(--ink);
+    font-family:'Work Sans',sans-serif; font-size:0.78rem; padding:6px 12px; border-radius:20px;
+    cursor:pointer; white-space:nowrap;
+  }
+  body.night .editToggle{ background:rgba(255,255,255,0.12); color:#EFE7DA; border-color:rgba(255,255,255,0.2);}
+  .editToggle.on{ background:var(--teal); color:#fff; border-color:var(--teal); }
+
+  /* Countdown ribbon */
+  .ribbon{
+    background:var(--teal); color:#fff; border-radius:var(--radius-card);
+    padding:14px 18px; display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:16px; gap:12px; flex-wrap:wrap;
+  }
+  .ribbon .num{ font-family:'Fraunces',serif; font-size:1.9rem; line-height:1; }
+  .ribbon .lbl{ font-size:0.82rem; opacity:0.85; }
+
+  /* Tabs */
+  .tabs{
+    display:flex; gap:2px; overflow-x:auto; margin-bottom:16px; border-bottom:1px solid var(--line);
+    -ms-overflow-style:none; scrollbar-width:none;
+  }
+  .tabs::-webkit-scrollbar{ display:none; }
+  .tab{
+    font-family:'Work Sans',sans-serif; font-size:0.88rem; padding:9px 14px; background:transparent;
+    border:none; border-bottom:2px solid transparent; color:var(--ink-soft); cursor:pointer; white-space:nowrap;
+  }
+  body.night .tab{ color:#C9BFB0; }
+  .tab.active{ color:var(--ink); border-bottom-color:var(--marigold); font-weight:600; }
+  body.night .tab.active{ color:#EFE7DA; }
+
+  .panel{ display:none; }
+  .panel.active{ display:block; animation:fade .35s ease; }
+  @keyframes fade{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;} }
+
+  /* Generic card */
+  .card{
+    background:var(--paper); border:1px solid var(--line); border-radius:var(--radius-card);
+    padding:16px 18px; box-shadow:var(--shadow-soft); margin-bottom:14px;
+  }
+  .card h3{ margin:0 0 8px; font-size:1.05rem; }
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media(max-width:640px){ .grid2{ grid-template-columns:1fr; } }
+
+  /* Dashboard cards */
+  .dash-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  @media(max-width:700px){ .dash-grid{ grid-template-columns:repeat(2,1fr); } }
+  .dash-card{
+    background:var(--paper); border:1px solid var(--line); border-radius:var(--radius-card);
+    padding:16px 14px; box-shadow:var(--shadow-soft); cursor:pointer; text-align:left;
+    font-family:'Work Sans',sans-serif; display:flex; flex-direction:column; gap:6px; min-height:96px;
+  }
+  .dash-card .ic{ font-size:1.4rem; }
+  .dash-card .t{ font-family:'Fraunces',serif; font-size:1.02rem; }
+  .dash-card .d{ font-size:0.78rem; color:var(--ink-soft); }
+
+  .weather-row{ display:flex; gap:14px; flex-wrap:wrap; }
+  .weather-box{ flex:1; min-width:150px; background:var(--paper-dim); border-radius:var(--radius-card); padding:10px 14px; }
+  .weather-box .city{ font-size:0.78rem; color:#000; }
+  .weather-box .val{ font-family:'Fraunces',serif; font-size:1.3rem; color:#000; }
+
+  /* Buttons */
+  .btn{
+    font-family:'Work Sans',sans-serif; font-size:0.86rem; border:1px solid var(--ink); background:var(--ink);
+    color:var(--paper); padding:8px 16px; border-radius:20px; cursor:pointer;
+  }
+  .btn.ghost{ background:transparent; color:var(--ink); }
+  .btn.marigold{ background:var(--marigold-deep); border-color:var(--marigold-deep); color:#fff; }
+  .btn.teal{ background:var(--teal); border-color:var(--teal); color:#fff; }
+  .btn.small{ padding:5px 11px; font-size:0.78rem; }
+  .btn:disabled{ opacity:0.5; cursor:default; }
+  body.night .btn.ghost{ color:#EFE7DA; border-color:rgba(255,255,255,0.35); }
+
+  input[type=text], input[type=date], input[type=time], input[type=tel], textarea, select{
+    font-family:'Work Sans',sans-serif; font-size:0.88rem; padding:8px 10px; border:1px solid var(--line);
+    border-radius:4px; background:#fff; width:100%; color:var(--ink);
+  }
+  textarea{ resize:vertical; min-height:70px; }
+  label{ font-size:0.76rem; color:var(--ink-soft); display:block; margin:8px 0 3px; }
+  .formRow{ margin-bottom:6px; }
+  .inline-add{ display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .inline-add input{ flex:1; min-width:160px; }
+
+  /* Thinking of you */
+  .poke-grid{ display:flex; flex-wrap:wrap; gap:8px; margin:10px 0 14px; }
+  .poke{
+    border:1px solid var(--line); background:var(--paper-dim); border-radius:20px; padding:8px 14px;
+    font-size:0.85rem; cursor:pointer;
+  }
+  .poke:hover{ background:var(--marigold); color:#fff; border-color:var(--marigold);}
+  .feed-item{ border-left:2px solid var(--marigold); padding:6px 0 6px 12px; margin-bottom:8px; font-size:0.88rem;}
+  .feed-item .when{ font-size:0.72rem; color:var(--ink-soft); }
+
+  /* Letters (envelope) */
+  .letter-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:14px; }
+  .envelope{
+    background:var(--paper); border:1px solid var(--line); border-radius:2px; padding:22px 16px;
+    text-align:center; cursor:pointer; box-shadow:var(--shadow-soft); position:relative; min-height:110px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .envelope:before{
+    content:""; position:absolute; top:0; left:0; right:0; height:50%;
+    background:linear-gradient(135deg, transparent 49.5%, var(--line) 50%, transparent 50.5%),
+               linear-gradient(-135deg, transparent 49.5%, var(--line) 50%, transparent 50.5%);
+  }
+  .envelope .txt{ font-family:'Fraunces',serif; font-size:1rem; z-index:1; }
+  .letter-open{ background:var(--paper); border:1px solid var(--line); border-radius:var(--radius-card); padding:20px; box-shadow:var(--shadow-soft); }
+  .letter-open .body{ white-space:pre-wrap; line-height:1.6; font-size:0.94rem; margin:10px 0; }
+
+  /* Memories timeline */
+  .memory-row{ display:flex; gap:14px; margin-bottom:18px; align-items:flex-start; }
+  .polaroid{ background:#fff; padding:6px 6px 22px; border:1px solid var(--line); box-shadow:var(--shadow-soft); width:150px; flex:none; transform:rotate(-1.2deg); }
+  .polaroid img{ width:100%; height:110px; object-fit:cover; display:block; }
+  .polaroid.noimg{ display:flex; align-items:center; justify-content:center; height:132px; color:var(--ink-soft); font-size:0.75rem; }
+  .memory-body .mt{ font-family:'Fraunces',serif; font-size:1.02rem; margin:0; }
+  .memory-body .md{ font-size:0.78rem; color:var(--ink-soft); margin:2px 0 6px; }
+  .memory-body .mdesc{ font-size:0.88rem; line-height:1.5; }
+
+  .jar-box{ text-align:center; padding:26px 16px; }
+  .jar-card{ background:var(--paper-dim); border-radius:var(--radius-card); padding:18px; margin-top:14px; font-family:'Fraunces',serif; font-size:1.05rem; min-height:60px; display:flex; align-items:center; justify-content:center; }
+
+  .list-item{ display:flex; align-items:flex-start; gap:10px; padding:9px 0; border-bottom:1px solid var(--line); }
+  .list-item:last-child{ border-bottom:none; }
+  .list-item .chk{ width:19px; height:19px; margin-top:2px; flex:none; cursor:pointer; }
+  .list-item .txt{ flex:1; font-size:0.92rem; }
+  .list-item .txt.done{ text-decoration:line-through; opacity:0.5; }
+  .list-item .sub{ font-size:0.76rem; color:var(--ink-soft); }
+  .list-item .del{ background:none; border:none; color:var(--ink-soft); cursor:pointer; font-size:0.9rem; }
+
+  .badge{ display:inline-block; font-size:0.7rem; padding:2px 8px; border-radius:10px; background:var(--paper-dim); color:var(--ink-soft); margin-left:6px;}
+
+  .food-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+  @media(max-width:640px){ .food-grid{ grid-template-columns:1fr; } }
+
+  .journal-entry{ border-bottom:1px solid var(--line); padding:12px 0; }
+  .journal-entry .je-head{ display:flex; justify-content:space-between; font-size:0.76rem; color:var(--ink-soft); }
+  .journal-entry .je-body{ font-size:0.92rem; margin-top:4px; line-height:1.55; white-space:pre-wrap; }
+
+  .empty{ color:var(--ink-soft); font-size:0.85rem; font-style:italic; padding:10px 0; }
+
+  .audio-item{ display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--line); }
+  .audio-item audio{ flex:1; height:32px; }
+
+  .settings-note{ font-size:0.8rem; color:var(--ink-soft); margin-top:10px; line-height:1.5; }
+  .toast{
+    position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--ink); color:var(--paper);
+    padding:10px 18px; border-radius:20px; font-size:0.85rem; opacity:0; pointer-events:none; transition:opacity .3s;
+    z-index:50;
+  }
+  .toast.show{ opacity:1; }
+  .callRow{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <div class="top">
+    <div>
+      <h1 class="greet" id="greeting">Loading… <span class="heart">❤</span></h1>
+      <p class="subline" id="dateline"></p>
+    </div>
+    <button class="editToggle" id="editToggleBtn" onclick="toggleEdit()">✎ Edit mode: off</button>
+  </div>
+
+  <div class="ribbon" id="countdownRibbon" onclick="showTab('calendar')" style="cursor:pointer;">
+    <div>
+      <div class="lbl" id="countdownLabel">days until we meet ❤</div>
+    </div>
+    <div class="num" id="countdownNum">–</div>
+  </div>
+
+  <div class="tabs" id="tabs">
+    <button class="tab" data-tab="home">Home</button>
+    <button class="tab" data-tab="messages">Messages</button>
+    <button class="tab" data-tab="memories">Memories</button>
+    <button class="tab" data-tab="calendar">Calendar</button>
+    <button class="tab" data-tab="daily">Daily Care</button>
+    <button class="tab" data-tab="food">Home &amp; Food</button>
+    <button class="tab" data-tab="journal">Journal</button>
+    <button class="tab" data-tab="proud">Proud Of</button>
+    <button class="tab" data-tab="settings">Settings</button>
+  </div>
+
+  <!-- HOME -->
+  <div class="panel" id="panel-home">
+    <div class="weather-row card">
+      <div class="weather-box">
+        <div class="city" id="w1city">Chennai</div>
+        <div class="val" id="w1val">–</div>
+      </div>
+      <div class="weather-box">
+        <div class="city" id="w2city">Home</div>
+        <div class="val" id="w2val">–</div>
+      </div>
+    </div>
+    <div class="dash-grid">
+      <button class="dash-card" onclick="showTab('messages')"><span class="ic">❤️</span><span class="t">Thinking of You</span><span class="d">A little hello, any time</span></button>
+      <button class="dash-card" onclick="showTab('messages')"><span class="ic">💌</span><span class="t">Open-When Letters</span><span class="d">Written for how you're feeling</span></button>
+      <button class="dash-card" onclick="showTab('memories')"><span class="ic">📸</span><span class="t">Our Memories</span><span class="d">A timeline of us</span></button>
+      <button class="dash-card" onclick="showTab('memories')"><span class="ic">🫙</span><span class="t">Memory Jar</span><span class="d">Pick one at random</span></button>
+      <button class="dash-card" onclick="showTab('daily')"><span class="ic">📝</span><span class="t">To-Do</span><span class="d">Your list for today</span></button>
+      <button class="dash-card" onclick="showTab('daily')"><span class="ic">🛒</span><span class="t">Shopping List</span><span class="d">Add what's needed</span></button>
+      <button class="dash-card" onclick="showTab('daily')"><span class="ic">🩺</span><span class="t">Health &amp; Reminders</span><span class="d">Medicine, walks, appointments</span></button>
+      <button class="dash-card" onclick="showTab('calendar')"><span class="ic">📅</span><span class="t">Calendar</span><span class="d">Important dates</span></button>
+      <button class="dash-card" onclick="showTab('food')"><span class="ic">🍲</span><span class="t">Home &amp; Food</span><span class="d">Recipes, favourites, places</span></button>
+    </div>
+    <div class="card" style="margin-top:14px;">
+      <h3>Call me</h3>
+      <div class="callRow" id="callRow"></div>
+    </div>
+  </div>
+
+  <!-- MESSAGES -->
+  <div class="panel" id="panel-messages">
+    <div class="card">
+      <h3>Thinking of you ❤️</h3>
+      <div class="poke-grid" id="pokeGrid"></div>
+      <div id="pokeFeed"></div>
+    </div>
+    <div class="card">
+      <h3>Open-when letters 💌</h3>
+      <div id="letterGrid" class="letter-grid"></div>
+      <div id="letterOpenArea" style="margin-top:14px;"></div>
+      <div id="letterEditArea"></div>
+    </div>
+    <div class="card">
+      <h3>Voice messages 🎙️</h3>
+      <div id="voiceControls"></div>
+      <div id="voiceList"></div>
+    </div>
+  </div>
+  <!-- MEMORIES -->
+  <div class="panel" id="panel-memories">
+    <div class="card">
+      <h3>Our memories 📸</h3>
+      <div id="memoryList"></div>
+      <div id="memoryEditArea"></div>
+    </div>
+    <div class="card jar-box">
+      <h3>Digital memory jar 🫙</h3>
+      <p style="font-size:0.85rem;color:var(--ink-soft);margin-top:0;">Click the jar and see what turns up.</p>
+      <button class="btn marigold" onclick="pickFromJar()">Pick a memory</button>
+      <div class="jar-card" id="jarCard">–</div>
+    </div>
+    <div class="card">
+      <h3>Video memories 🎥</h3>
+      <div id="videoList"></div>
+      <div id="videoEditArea"></div>
+    </div>
+  </div>
+
+  <!-- CALENDAR -->
+  <div class="panel" id="panel-calendar">
+    <div class="card">
+      <h3>Our calendar 📅</h3>
+      <div id="calendarList"></div>
+      <div id="calendarEditArea"></div>
+    </div>
+    <div class="card">
+      <h3>Important days 🎂</h3>
+      <div id="importantList"></div>
+      <div id="importantEditArea"></div>
+    </div>
+  </div>
+
+  <!-- DAILY -->
+  <div class="panel" id="panel-daily">
+    <div class="card">
+      <h3>Health &amp; reminders 🩺</h3>
+      <div id="reminderList"></div>
+      <div id="reminderEditArea"></div>
+    </div>
+    <div class="card">
+      <h3>❤️ Health Reminders &amp; Notifications</h3>
+      <p class="settings-note">Set a daily medicine, water, walking, food, or custom reminder. The browser notification works while this page/PWA is active.</p>
+      <div class="formRow">
+        <label>Reminder type</label>
+        <select id="healthType">
+          <option value="Medicine">💊 Medicine</option>
+          <option value="Drink Water">💧 Drink Water</option>
+          <option value="Walking">🚶 Walking</option>
+          <option value="Food">🥗 Food</option>
+          <option value="Health">❤️ Health</option>
+          <option value="Custom">✏️ Custom</option>
+        </select>
+      </div>
+      <div class="formRow">
+        <label>Time</label>
+        <input type="time" id="healthTime">
+      </div>
+      <div class="formRow">
+        <label>Message</label>
+        <input type="text" id="healthMessage" placeholder="Example: Appa, please take your evening medicine 💊">
+      </div>
+      <div class="callRow">
+        <button class="btn teal" onclick="addHealthReminderFromForm()">Add health reminder</button>
+        <button class="btn ghost" onclick="registerAppaPush()">Enable notifications</button>
+        <button class="btn ghost" onclick="sendTestNotification()">Test notification</button>
+      </div>
+      <div id="notificationStatus" class="settings-note"></div>
+      <div class="settings-note">
+        For real cross-device notifications, use <strong>Enable notifications</strong> on Appa's device.
+      </div>
+      <div id="healthReminderList"></div>
+    </div>
+    <div class="card">
+      <h3>To-do list 📝</h3>
+      <div id="todoList"></div>
+      <div id="todoEditArea"></div>
+    </div>
+    <div class="card">
+      <h3>Shopping list 🛒</h3>
+      <div id="shoppingList"></div>
+      <div id="shoppingEditArea"></div>
+    </div>
+  </div>
+
+  <!-- FOOD -->
+  <div class="panel" id="panel-food">
+    <div class="food-grid">
+      <div class="card"><h3>Things Appa loves</h3><div id="food-loves"></div><div id="foodedit-loves"></div></div>
+      <div class="card"><h3>Things we cook together</h3><div id="food-cook"></div><div id="foodedit-cook"></div></div>
+      <div class="card"><h3>Recipes from home</h3><div id="food-recipes"></div><div id="foodedit-recipes"></div></div>
+      <div class="card"><h3>Places to eat when I'm home</h3><div id="food-places"></div><div id="foodedit-places"></div></div>
+    </div>
+  </div>
+
+  <!-- JOURNAL -->
+  <div class="panel" id="panel-journal">
+    <div class="card">
+      <h3>Things I want to tell Appa ✉️</h3>
+      <div id="journalList"></div>
+      <div id="journalEditArea"></div>
+    </div>
+  </div>
+
+  <!-- PROUD -->
+  <div class="panel" id="panel-proud">
+    <div class="card">
+      <h3>Things we're proud of 🌱</h3>
+      <div id="proudList"></div>
+      <div id="proudEditArea"></div>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="panel" id="panel-settings">
+    <div class="card">
+      <h3>Settings</h3>
+<div class="card">
+    <h3>🔔 Notifications</h3>
+
+    <p>
+        Allow Appa Connect to send reminders and updates.
+    </p>
+
+    <button class="btn" onclick="registerAppaPush()">
+        Enable Notifications
+    </button>
+
+    <button class="btn ghost" onclick="sendTestNotification()">
+        Test Notification
+    </button>
+</div>
+      <div class="formRow"><label>Father's name (used in greetings)</label><input type="text" id="cfgFatherName"></div>
+      <div class="formRow"><label>Your name</label><input type="text" id="cfgHerName"></div>
+      <div class="formRow"><label>Your city</label><input type="text" id="cfgHerCity"></div>
+      <div class="formRow"><label>His city</label><input type="text" id="cfgHisCity"></div>
+      <div class="formRow"><label>Next visit date</label><input type="date" id="cfgMeetingDate"></div>
+      <div class="formRow"><label>Phone number (for Call button)</label><input type="tel" id="cfgPhone" placeholder="+91XXXXXXXXXX"></div>
+      <div class="formRow"><label>Video call link (WhatsApp / Meet / etc.)</label><input type="text" id="cfgVideoLink" placeholder="https://wa.me/..."></div>
+      <div class="formRow"><label>Chennai weather (edit by hand — e.g. "31°C, sunny ☀️")</label><input type="text" id="cfgW1"></div>
+      <div class="formRow"><label>Home weather</label><input type="text" id="cfgW2"></div>
+      <button class="btn teal" onclick="saveConfig()">Save settings</button>
+      <p class="settings-note">
+        Edit mode (top right) reveals add / delete controls throughout the site so you can fill it in — turn it off before sharing the link with your father, so he sees a clean, calm view.<br><br>
+        Everything you add is stored so it's there the next time either of you opens this page. Weather updates by hand for now — there's no live weather feed wired in, so update the two fields above whenever you like.
+      </p>
+    </div>
+  </div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+async function requestNotificationPermission(){
+  if(!('Notification' in window)){
+    updateNotificationStatus('Notifications are not supported in this browser.');
+    return false;
+  }
+
+  if(!window.isSecureContext && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1'){
+    updateNotificationStatus('Notifications require HTTPS (or localhost for testing).');
+    return false;
+  }
+
+  if(Notification.permission === 'granted'){
+    updateNotificationStatus('Notifications are enabled 🔔');
+    return true;
+  }
+
+  if(Notification.permission === 'denied'){
+    updateNotificationStatus('Notifications are blocked. Allow them in Chrome site settings.');
+    return false;
+  }
+
+  const permission = await Notification.requestPermission();
+  updateNotificationStatus(permission === 'granted' ? 'Notifications are enabled 🔔' : 'Notifications were not enabled.');
+  return permission === 'granted';
+}
+
+
+/* ---------- real Web Push registration ---------- */
+/*
+  Change this only if your Appa user has a different ID in FastAPI.
+  The ID is returned by POST /users in http://localhost:8000/docs.
+*/
+const APPA_USER_ID = 1;
+const API_BASE_URL = 'http://localhost:8000';
+
+function urlBase64ToUint8Array(base64String){
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding)
+    .replace(/-/g, '+')
+    .replace(/_/g, '/');
+
+  const rawData = window.atob(base64);
+
+  return Uint8Array.from(
+    [...rawData].map(char => char.charCodeAt(0))
+  );
+}
+
+async function registerAppaPush(){
+  if(!('serviceWorker' in navigator)){
+    updateNotificationStatus('Service workers are not supported in this browser.');
+    return false;
+  }
+
+  if(!('PushManager' in window)){
+    updateNotificationStatus('Push notifications are not supported in this browser.');
+    return false;
+  }
+
+  if(!window.isSecureContext &&
+     location.hostname !== 'localhost' &&
+     location.hostname !== '127.0.0.1'){
+    updateNotificationStatus('Push notifications require HTTPS (localhost is okay for testing).');
+    return false;
+  }
+
+  try{
+    const permission = await Notification.requestPermission();
+
+    if(permission !== 'granted'){
+      updateNotificationStatus('Notification permission was not granted.');
+      return false;
+    }
+
+    const registration = await navigator.serviceWorker.ready;
+
+    const keyResponse = await fetch(
+      API_BASE_URL + '/push/public-key'
+    );
+
+    if(!keyResponse.ok){
+      throw new Error(
+        'FastAPI could not provide the VAPID public key. Check /push/public-key.'
+      );
+    }
+
+    const keyData = await keyResponse.json();
+
+    if(!keyData.publicKey){
+      throw new Error('VAPID public key is missing.');
+    }
+
+    const applicationServerKey =
+      urlBase64ToUint8Array(keyData.publicKey);
+
+    let subscription =
+      await registration.pushManager.getSubscription();
+
+    if(!subscription){
+      subscription =
+        await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: applicationServerKey
+        });
+    }
+
+    const subscriptionJSON = subscription.toJSON();
+
+    if(!subscriptionJSON.endpoint ||
+       !subscriptionJSON.keys ||
+       !subscriptionJSON.keys.p256dh ||
+       !subscriptionJSON.keys.auth){
+      throw new Error('Browser returned an incomplete push subscription.');
+    }
+
+    const response = await fetch(
+      API_BASE_URL + '/push/subscribe',
+      {
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json'
+        },
+        body:JSON.stringify({
+          user_id:APPA_USER_ID,
+          endpoint:subscriptionJSON.endpoint,
+          p256dh:subscriptionJSON.keys.p256dh,
+          auth:subscriptionJSON.keys.auth
+        })
+      }
+    );
+
+    const result = await response.json().catch(() => ({}));
+
+    if(!response.ok){
+      throw new Error(
+        result.detail || 'FastAPI could not save the push subscription.'
+      );
+    }
+
+    localStorage.setItem(
+      'appaPushRegistered',
+      'true'
+    );
+
+    updateNotificationStatus(
+      'Real push notifications are enabled 🔔'
+    );
+
+    toast('Appa Connect push notifications enabled ❤️');
+
+    console.log(
+      'Push subscription registered successfully:',
+      subscriptionJSON
+    );
+
+    return true;
+
+  }catch(error){
+    console.error('Push registration failed:', error);
+
+    updateNotificationStatus(
+      'Could not enable push notifications: ' + error.message
+    );
+
+    return false;
+  }
+}
+
+function updateNotificationStatus(message){
+  const el=document.getElementById('notificationStatus');
+  if(el) el.textContent=message;
+}
+
+async function sendTestNotification(){
+  if(!('Notification' in window)){
+    updateNotificationStatus('Notifications are not supported in this browser.');
+    return;
+  }
+
+  if(Notification.permission !== 'granted'){
+    updateNotificationStatus('Please click “Enable notifications” first.');
+    return;
+  }
+
+  try{
+    const registration = await navigator.serviceWorker.ready;
+
+    await registration.showNotification('Appa Connect ❤️',{
+      body:'Appa, this is a local test notification from Sanjana!',
+      icon:'./icon-192.png',
+      badge:'./icon-192.png',
+      data:{
+        url:'./appa-connect.html'
+      }
+    });
+
+    updateNotificationStatus('Test notification sent 🔔');
+  }catch(e){
+    console.error('Notification failed:',e);
+
+    try{
+      new Notification('Appa Connect ❤️',{
+        body:'Appa, this is a local test notification from Sanjana!'
+      });
+
+      updateNotificationStatus('Test notification sent 🔔');
+    }catch(fallbackError){
+      console.error('Fallback notification failed:',fallbackError);
+      updateNotificationStatus('Could not show the notification. Check Chrome site settings.');
+    }
+  }
+}
+
+function sendAppNotification(title,body){
+  if(!('Notification' in window) || Notification.permission !== 'granted') return false;
+  try{
+    new Notification(title,{body});
+    return true;
+  }catch(e){
+    console.error('Notification failed:',e);
+    return false;
+  }
+}
+
+/* ---------- storage helpers ---------- */
+function loadKey(key, fallback){
+    try {
+        const value = localStorage.getItem(key);
+        return value ? JSON.parse(value) : fallback;
+    } catch(e) {
+        console.error("Could not load:", key, e);
+        return fallback;
+    }
+}
+
+function saveKey(key, value){
+    try {
+        localStorage.setItem(key, JSON.stringify(value));
+    } catch(e) {
+        console.error("Could not save:", key, e);
+        toast("Could not save data");
+    }
+}
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 1800);
+}
+
+/* ---------- state ---------- */
+let editMode = false;
+let CFG = { fatherName:'Appa', herName:'Sanjana', herCity:'Chennai', hisCity:'home', meetingDate:'', phone:'', videoLink:'', w1:'31°C ☀️', w2:'27°C 🌧️' };
+let DATA = { poke:[], letters:[], memories:[], voice:[], video:[], calEvents:[], important:[], reminders:[], todos:[], shopping:[], healthReminders:[],
+  food:{loves:[],cook:[],recipes:[],places:[]}, journal:[], proud:[] };
+
+const seedLetters = [
+  {id:'l1', title:'Open when you miss me', body:'Appa, if you\'re reading this, know that I\'m only a phone call away, and thinking of you probably right this second too.'},
+  {id:'l2', title:'Open when you had a difficult day', body:'Whatever happened today, it doesn\'t change how proud I am to be your daughter. Rest a little. Tomorrow is a new one.'},
+  {id:'l3', title:'Open when you are proud of me', body:'Every single thing I\'m building here, I\'m building because you taught me I could. Thank you, Appa.'},
+  {id:'l4', title:'Open when you need motivation', body:'You\'ve gotten through harder days than this one. I believe in you the way you\'ve always believed in me.'},
+  {id:'l5', title:'Open when you cannot sleep', body:'Close your eyes and picture home on an ordinary evening — that\'s where I am too, in my head, most nights.'},
+  {id:'l6', title:'Open when you just want to hear from me', body:'Hi Appa. I\'m okay, I\'m eating, I\'m working hard, and I love you. That\'s really all this letter needed to say.'}
+];
+const seedFood = {
+  loves:['Filter coffee, strong','Curd rice on a hot day'],
+  cook:['Sunday sambar','Dosa on lazy mornings'],
+  recipes:['Amma\'s rasam, written down at last'],
+  places:['That Saravana Bhavan near the station','The tea shop by the old bus stand']
+};
+const jarQuotes = ["Remember when we got lost looking for that temple and found the best tea shop instead?",
+  "You once said the secret to everything is 'patience and filter coffee.' Still true.",
+  "That photo of you trying to fix the ceiling fan and pretending you knew what you were doing.",
+  "The drive to college, the radio too loud, both of us singing badly."];
+
+/* ---------- init ---------- */
+async function init(){
+  CFG = Object.assign(CFG, await loadKey('config', CFG));
+  DATA.poke = await loadKey('poke', []);
+  DATA.letters = await loadKey('letters', seedLetters.map(l=>({...l, opened:false})));
+  DATA.memories = await loadKey('memories', [
+    {id:'m1', title:'The day I left for college', date:'', photo:'', desc:'You dropped me off and pretended you weren\'t emotional. I saw you wipe your eyes in the mirror.'}
+  ]);
+  DATA.voice = await loadKey('voice', []);
+  DATA.video = await loadKey('video', []);
+  DATA.calEvents = await loadKey('calEvents', []);
+  DATA.important = await loadKey('important', []);
+  DATA.reminders = await loadKey('reminders', [{id:'r1', text:'Medicine', time:'8:00 PM'}, {id:'r2', text:'Evening walk', time:'6:00 PM'}]);
+  DATA.healthReminders = await loadKey('healthReminders', []);
+  DATA.todos = await loadKey('todos', []);
+  DATA.shopping = await loadKey('shopping', []);
+  DATA.food = await loadKey('food', seedFood);
+  DATA.journal = await loadKey('journal', []);
+  DATA.proud = await loadKey('proud', []);
+
+  fillSettingsForm();
+  renderAll();
+  setupTabs();
+  updateGreeting();
+  setInterval(updateGreeting, 60000);
+  updateNotificationStatus(
+    ('Notification' in window)
+      ? (localStorage.getItem('appaPushRegistered') === 'true'
+          ? 'Real push notifications are enabled 🔔'
+          : 'Notification status: '+Notification.permission)
+      : 'Notifications are not supported.'
+  );
+  setInterval(checkHealthReminders, 30000);
+}
+
+function fillSettingsForm(){
+  cfgFatherName.value = CFG.fatherName; cfgHerName.value = CFG.herName; cfgHerCity.value = CFG.herCity;
+  cfgHisCity.value = CFG.hisCity; cfgMeetingDate.value = CFG.meetingDate; cfgPhone.value = CFG.phone;
+  cfgVideoLink.value = CFG.videoLink; cfgW1.value = CFG.w1; cfgW2.value = CFG.w2;
+}
+async function saveConfig(){
+  CFG = { fatherName:cfgFatherName.value||'Appa', herName:cfgHerName.value||'Sanjana', herCity:cfgHerCity.value||'Chennai',
+    hisCity:cfgHisCity.value||'home', meetingDate:cfgMeetingDate.value, phone:cfgPhone.value, videoLink:cfgVideoLink.value,
+    w1:cfgW1.value, w2:cfgW2.value };
+  await saveKey('config', CFG);
+  updateGreeting(); renderWeather(); renderCall(); renderCountdown();
+  toast('Settings saved');
+}
+
+/* ---------- edit mode ---------- */
+function toggleEdit(){
+  editMode = !editMode;
+  const b = document.getElementById('editToggleBtn');
+  b.textContent = editMode ? '✎ Edit mode: on' : '✎ Edit mode: off';
+  b.classList.toggle('on', editMode);
+  renderAll();
+}
+
+/* ---------- tabs ---------- */
+function setupTabs(){
+  document.querySelectorAll('.tab').forEach(t=>{
+    t.addEventListener('click', ()=>showTab(t.dataset.tab));
+  });
+  showTab('home');
+}
+function showTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===name));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active', p.id==='panel-'+name));
+}
+
+/* ---------- greeting / time-of-day theme ---------- */
+function updateGreeting(){
+  const now = new Date();
+  const h = now.getHours();
+  let period, bg1, bg2, night=false;
+  if(h>=5 && h<12){ period='Good Morning'; bg1='#FDEBD3'; bg2='#FCE0C4'; }
+  else if(h>=12 && h<17){ period='Good Afternoon'; bg1='#EAF3EF'; bg2='#DCEDE6'; }
+  else if(h>=17 && h<20){ period='Good Evening'; bg1='#F3D9C4'; bg2='#E3B8C7'; }
+  else { period='Good Night'; bg1='#232244'; bg2='#2E2A52'; night=true; }
+  document.body.style.setProperty('--bg-1', bg1);
+  document.body.style.setProperty('--bg-2', bg2);
+  document.body.style.background = 'linear-gradient(160deg,'+bg1+','+bg2+')';
+  document.body.classList.toggle('night', night);
+  document.getElementById('greeting').innerHTML = period+', '+CFG.fatherName+' <span class="heart">❤</span>';
+  document.getElementById('dateline').textContent = now.toLocaleDateString(undefined,{weekday:'long', year:'numeric', month:'long', day:'numeric'})+' · '+now.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
+  renderCountdown();
+}
+function renderCountdown(){
+  const lbl = document.getElementById('countdownLabel');
+  const num = document.getElementById('countdownNum');
+  if(!CFG.meetingDate){ lbl.textContent = 'Add your next visit date in Settings'; num.textContent='–'; return; }
+  const today = new Date(); today.setHours(0,0,0,0);
+  const target = new Date(CFG.meetingDate); target.setHours(0,0,0,0);
+  const days = Math.round((target-today)/86400000);
+  if(days>0){ lbl.textContent = 'days until '+CFG.herName+' comes home ❤'; num.textContent = days; }
+  else if(days===0){ lbl.textContent = "today's the day ❤"; num.textContent = '🎉'; }
+  else { lbl.textContent = 'since '+CFG.herName+' was last home'; num.textContent = Math.abs(days); }
+}
+function renderWeather(){
+  w1city.textContent = CFG.herCity; w2city.textContent = CFG.hisCity;
+  w1val.textContent = CFG.w1||'–'; w2val.textContent = CFG.w2||'–';
+}
+function renderCall(){
+  const row = document.getElementById('callRow'); row.innerHTML='';
+  if(CFG.phone){
+    row.innerHTML += '<a class="btn teal" href="tel:'+CFG.phone+'">📞 Call</a>';
+  }
+  if(CFG.videoLink){
+    row.innerHTML += '<a class="btn marigold" href="'+CFG.videoLink+'" target="_blank" rel="noopener">🎥 Video call</a>';
+  }
+  if(!CFG.phone && !CFG.videoLink){
+    row.innerHTML = '<span class="empty">Add a phone number or video call link in Settings.</span>';
+  }
+}
+
+/* ---------- render everything ---------- */
+function renderAll(){
+  renderWeather(); renderCall(); renderCountdown();
+  renderPoke(); renderLetters(); renderVoice();
+  renderMemories(); renderVideos();
+  renderCalendar(); renderImportant();
+  renderReminders(); renderHealthReminders(); renderTodos(); renderShopping();
+  renderFood(); renderJournal(); renderProud();
+}
+
+/* ---------- Thinking of you ---------- */
+const pokePresets = ['Had dinner ❤️','Reached safely','Good luck today','Missing home','Just wanted to say I love you','Thinking of you right now'];
+function renderPoke(){
+  const grid = document.getElementById('pokeGrid'); grid.innerHTML='';
+  pokePresets.forEach(p=>{
+    const b = document.createElement('button'); b.className='poke'; b.textContent=p;
+    b.onclick = ()=>sendPoke(p); grid.appendChild(b);
+  });
+  const feed = document.getElementById('pokeFeed');
+  if(DATA.poke.length===0){ feed.innerHTML = '<div class="empty">No messages yet — send the first one.</div>'; return; }
+  feed.innerHTML = DATA.poke.slice().reverse().slice(0,12).map(p=>
+    '<div class="feed-item">'+esc(p.text)+'<div class="when">'+CFG.herName+' · '+timeAgo(p.ts)+'</div></div>'
+  ).join('');
+}
+async function sendPoke(text){
+  DATA.poke.push({text, ts:Date.now()});
+  await saveKey('poke', DATA.poke);
+  sendAppNotification('New message from '+CFG.herName+' ❤️', text);
+  renderPoke(); toast('Sent ❤️');
+}
+
+/* ---------- Letters ---------- */
+function renderLetters(){
+  const grid = document.getElementById('letterGrid'); grid.innerHTML='';
+  DATA.letters.forEach(l=>{
+    const d = document.createElement('div'); d.className='envelope';
+    d.innerHTML = '<div class="txt">'+esc(l.title)+'</div>';
+    d.onclick = ()=>openLetter(l.id);
+    grid.appendChild(d);
+  });
+  document.getElementById('letterEditArea').innerHTML = editMode ?
+    '<div class="inline-add"><input id="newLetterTitle" placeholder="Open when…"><textarea id="newLetterBody" placeholder="Write the letter…" style="flex:1 1 100%;"></textarea><button class="btn small teal" onclick="addLetter()">Add letter</button></div>' : '';
+}
+function openLetter(id){
+  const l = DATA.letters.find(x=>x.id===id); if(!l) return;
+  document.getElementById('letterOpenArea').innerHTML =
+    '<div class="letter-open"><h3 class="serif">'+esc(l.title)+'</h3><div class="body">'+esc(l.body)+'</div>'+
+    (editMode ? '<button class="btn small ghost" onclick="deleteLetter(\''+id+'\')">Delete this letter</button>' : '')+'</div>';
+}
+async function addLetter(){
+  const t = document.getElementById('newLetterTitle').value.trim();
+  const b = document.getElementById('newLetterBody').value.trim();
+  if(!t||!b) return;
+  DATA.letters.push({id:'l'+Date.now(), title:t, body:b});
+  await saveKey('letters', DATA.letters);
+  renderLetters(); toast('Letter added');
+}
+async function deleteLetter(id){
+  DATA.letters = DATA.letters.filter(l=>l.id!==id);
+  await saveKey('letters', DATA.letters);
+  document.getElementById('letterOpenArea').innerHTML='';
+  renderLetters();
+}
+
+/* ---------- Voice messages ---------- */
+let mediaRecorder, audioChunks=[];
+function renderVoiceControls(){
+  document.getElementById('voiceControls').innerHTML = editMode ?
+    '<div class="inline-add"><input id="voiceTitle" placeholder="e.g. Good morning Appa"><button class="btn small teal" id="recBtn" onclick="toggleRecord()">● Record (max 45s)</button></div><div class="settings-note" id="recStatus"></div>' : '';
+}
+async function toggleRecord(){
+  const btn = document.getElementById('recBtn');
+  if(!mediaRecorder || mediaRecorder.state==='inactive'){
+    try{
+      const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+      mediaRecorder = new MediaRecorder(stream);
+      audioChunks = [];
+      mediaRecorder.ondataavailable = e=>audioChunks.push(e.data);
+      mediaRecorder.onstop = async ()=>{
+        const blob = new Blob(audioChunks, {type:'audio/webm'});
+        const reader = new FileReader();
+        reader.onloadend = async ()=>{
+          const title = document.getElementById('voiceTitle').value.trim() || 'Voice message';
+          DATA.voice.push({id:'v'+Date.now(), title, date:new Date().toLocaleDateString(), data:reader.result});
+          await saveKey('voice', DATA.voice);
+          renderVoice(); toast('Voice message saved');
+        };
+        reader.readAsDataURL(blob);
+      };
+      mediaRecorder.start();
+      btn.textContent = '■ Stop recording';
+      document.getElementById('recStatus').textContent = 'Recording… click stop when done.';
+      setTimeout(()=>{ if(mediaRecorder && mediaRecorder.state==='recording') mediaRecorder.stop(); }, 45000);
+    }catch(e){
+      document.getElementById('recStatus').textContent = 'Could not access microphone — check browser permissions.';
+    }
+  } else {
+    mediaRecorder.stop();
+    btn.textContent = '● Record (max 45s)';
+    document.getElementById('recStatus').textContent = '';
+  }
+}
+function renderVoice(){
+  renderVoiceControls();
+  const list = document.getElementById('voiceList');
+  if(DATA.voice.length===0){ list.innerHTML = '<div class="empty">No voice messages yet.</div>'; return; }
+  list.innerHTML = DATA.voice.slice().reverse().map(v=>
+    '<div class="audio-item"><div style="min-width:120px;"><div style="font-size:0.85rem;">'+esc(v.title)+'</div><div class="settings-note" style="margin:0;">'+esc(v.date)+'</div></div><audio controls src="'+v.data+'"></audio>'+
+    (editMode ? '<button class="del" onclick="deleteVoice(\''+v.id+'\')">✕</button>' : '')+'</div>'
+  ).join('');
+}
+async function deleteVoice(id){ DATA.voice = DATA.voice.filter(v=>v.id!==id); await saveKey('voice', DATA.voice); renderVoice(); }
+
+/* ---------- Memories ---------- */
+function renderMemories(){
+  const list = document.getElementById('memoryList');
+  if(DATA.memories.length===0){ list.innerHTML = '<div class="empty">No memories added yet.</div>'; }
+  else {
+    list.innerHTML = DATA.memories.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map(m=>
+      '<div class="memory-row">'+
+      (m.photo ? '<div class="polaroid"><img src="'+m.photo+'"></div>' : '<div class="polaroid noimg">no photo</div>')+
+      '<div class="memory-body"><p class="mt">'+esc(m.title)+'</p><p class="md">'+esc(m.date||'')+'</p><p class="mdesc">'+esc(m.desc)+'</p>'+
+      (editMode ? '<button class="btn small ghost" onclick="deleteMemory(\''+m.id+'\')">Delete</button>' : '')+
+      '</div></div>'
+    ).join('');
+  }
+  document.getElementById('memoryEditArea').innerHTML = editMode ?
+    '<div class="card" style="background:var(--paper-dim);">'+
+    '<label>Title</label><input id="newMemTitle" placeholder="My first day at VIT">'+
+    '<label>Date</label><input type="date" id="newMemDate">'+
+    '<label>Description</label><textarea id="newMemDesc" placeholder="The day you dropped me off…"></textarea>'+
+    '<label>Photo</label><input type="file" id="newMemPhoto" accept="image/*">'+
+    '<div style="margin-top:8px;"><button class="btn small teal" onclick="addMemory()">Add memory</button></div>'+
+    '</div>' : '';
+}
+async function addMemory(){
+  const title = document.getElementById('newMemTitle').value.trim();
+  const date = document.getElementById('newMemDate').value;
+  const desc = document.getElementById('newMemDesc').value.trim();
+  const file = document.getElementById('newMemPhoto').files[0];
+  if(!title) return;
+  const finish = async (photoData)=>{
+    DATA.memories.push({id:'m'+Date.now(), title, date, desc, photo:photoData||''});
+    await saveKey('memories', DATA.memories);
+    renderMemories(); toast('Memory added');
+    sendAppNotification('Appa Connect 📸','A new memory was added.');
+  };
+  if(file){ compressImage(file, finish); } else { finish(''); }
+}
+async function deleteMemory(id){ DATA.memories = DATA.memories.filter(m=>m.id!==id); await saveKey('memories', DATA.memories); renderMemories(); }
+function compressImage(file, cb){
+  const reader = new FileReader();
+  reader.onload = e=>{
+    const img = new Image();
+    img.onload = ()=>{
+      const canvas = document.createElement('canvas');
+      const maxW = 640; const scale = Math.min(1, maxW/img.width);
+      canvas.width = img.width*scale; canvas.height = img.height*scale;
+      canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+      cb(canvas.toDataURL('image/jpeg', 0.72));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ---------- Memory jar ---------- */
+function pickFromJar(){
+  const pool = DATA.memories.map(m=>m.title+' — '+m.desc).concat(jarQuotes);
+  if(pool.length===0){ document.getElementById('jarCard').textContent='Add a few memories first.'; return; }
+  document.getElementById('jarCard').textContent = pool[Math.floor(Math.random()*pool.length)];
+}
+
+/* ---------- Video memories ---------- */
+function renderVideos(){
+  const list = document.getElementById('videoList');
+  if(DATA.video.length===0){ list.innerHTML = '<div class="empty">No videos linked yet.</div>'; }
+  else {
+    list.innerHTML = DATA.video.map(v=>
+      '<div class="list-item"><div class="txt"><a href="'+esc(v.url)+'" target="_blank" rel="noopener">'+esc(v.title)+'</a><span class="badge">'+esc(v.cat)+'</span></div>'+
+      (editMode ? '<button class="del" onclick="deleteVideo(\''+v.id+'\')">✕</button>' : '')+'</div>'
+    ).join('');
+  }
+  document.getElementById('videoEditArea').innerHTML = editMode ?
+    '<div class="inline-add"><input id="newVidTitle" placeholder="Title"><input id="newVidUrl" placeholder="YouTube / Drive link">'+
+    '<select id="newVidCat"><option>Family</option><option>College</option><option>Festivals</option><option>Trips</option><option>Special Days</option><option>Messages for '+esc(CFG.fatherName)+'</option></select>'+
+    '<button class="btn small teal" onclick="addVideo()">Add</button></div>' : '';
+}
+async function addVideo(){
+  const title = document.getElementById('newVidTitle').value.trim();
+  const url = document.getElementById('newVidUrl').value.trim();
+  const cat = document.getElementById('newVidCat').value;
+  if(!title||!url) return;
+  DATA.video.push({id:'vd'+Date.now(), title, url, cat});
+  await saveKey('video', DATA.video);
+  renderVideos(); toast('Video added');
+  sendAppNotification('Appa Connect 🎥','A new video memory was added: '+title);
+}
+async function deleteVideo(id){ DATA.video = DATA.video.filter(v=>v.id!==id); await saveKey('video', DATA.video); renderVideos(); }
+
+/* ---------- Health reminders + browser notifications ---------- */
+function addHealthReminderFromForm(){
+  const type=document.getElementById('healthType').value;
+  const time=document.getElementById('healthTime').value;
+  const message=document.getElementById('healthMessage').value.trim();
+  if(!time || !message){ alert('Please select a time and enter a message.'); return; }
+
+  DATA.healthReminders.push({
+    id:'h'+Date.now(), type, time, message, enabled:true, lastTriggered:''
+  });
+  saveKey('healthReminders',DATA.healthReminders);
+  document.getElementById('healthTime').value='';
+  document.getElementById('healthMessage').value='';
+  renderHealthReminders();
+  toast('Health reminder added ❤️');
+}
+
+function renderHealthReminders(){
+  const list=document.getElementById('healthReminderList');
+  if(!list) return;
+  const items=DATA.healthReminders.slice().sort((a,b)=>(a.time||'').localeCompare(b.time||''));
+  list.innerHTML=items.length ? items.map(r=>
+    '<div class="list-item">'+
+      '<div class="txt">'+esc(r.type)+' · '+esc(r.message)+'<div class="sub">Every day at '+esc(r.time)+'</div></div>'+
+      '<button class="del" onclick="toggleHealthReminder(\''+r.id+'\')">'+(r.enabled?'⏸':'▶')+'</button>'+
+      '<button class="del" onclick="deleteHealthReminder(\''+r.id+'\')">✕</button>'+
+    '</div>'
+  ).join('') : '<div class="empty">No health reminders yet.</div>';
+}
+
+function toggleHealthReminder(id){
+  const r=DATA.healthReminders.find(x=>x.id===id);
+  if(!r) return;
+  r.enabled=!r.enabled;
+  saveKey('healthReminders',DATA.healthReminders);
+  renderHealthReminders();
+}
+
+function deleteHealthReminder(id){
+  DATA.healthReminders=DATA.healthReminders.filter(x=>x.id!==id);
+  saveKey('healthReminders',DATA.healthReminders);
+  renderHealthReminders();
+  toast('Health reminder deleted');
+}
+
+function checkHealthReminders(){
+  if(!DATA.healthReminders.length) return;
+  const now=new Date();
+  const currentTime=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  const today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+
+  let changed=false;
+  DATA.healthReminders.forEach(r=>{
+    if(!r.enabled || r.time!==currentTime || r.lastTriggered===today) return;
+    if(sendAppNotification('Appa Connect ❤️',r.message)){
+      r.lastTriggered=today;
+      changed=true;
+    }
+  });
+  if(changed) saveKey('healthReminders',DATA.healthReminders);
+}
+
+/* ---------- generic simple list section (calendar, important, reminders, todos, shopping, journal, proud) ---------- */
+function renderCalendar(){
+  const list = document.getElementById('calendarList');
+  const sorted = DATA.calEvents.slice().sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  list.innerHTML = sorted.length ? sorted.map(ev=>
+    '<div class="list-item"><div class="txt">'+esc(ev.title)+'<div class="sub">'+fmtDate(ev.date)+'</div></div>'+
+    (editMode ? '<button class="del" onclick="delItem(\'calEvents\',\''+ev.id+'\',renderCalendar)">✕</button>' : '')+'</div>'
+  ).join('') : '<div class="empty">No events yet.</div>';
+  document.getElementById('calendarEditArea').innerHTML = editMode ?
+    '<div class="inline-add"><input id="newEvTitle" placeholder="Event"><input type="date" id="newEvDate" style="max-width:170px;"><button class="btn small teal" onclick="addSimple(\'calEvents\',{title:evVal(\'newEvTitle\'),date:evVal(\'newEvDate\')},renderCalendar)">Add</button></div>' : '';
+}
+function renderImportant(){
+  const list = document.getElementById('importantList');
+  const sorted = DATA.important.slice().sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  list.innerHTML = sorted.length ? sorted.map(ev=>
+    '<div class="list-item"><div class="txt">🎂 '+esc(ev.title)+'<div class="sub">'+fmtDate(ev.date)+'</div></div>'+
+    (editMode ? '<button class="del" onclick="delItem(\'important\',\''+ev.id+'\',renderImportant)">✕</button>' : '')+'</div>'
+  ).join('') : '<div class="empty">No important days added yet.</div>';
+  document.getElementById('importantEditArea').innerHTML = editMode ?
+    '<div class="inline-add"><input id="newImpTitle" placeholder="e.g. Appa\'s birthday"><input type="date" id="newImpDate" style="max-width:170px;"><button class="btn small teal" onclick="addSimple(\'important\',{title:evVal(\'newImpTitle\'),date:evVal(\'newImpDate\')},renderImportant)">Add</button></div>' : '';
+}
+function renderReminders(){
+  const list = document.getElementById('reminderList');
+  list.innerHTML = DATA.reminders.length ? DATA.reminders.map(r=>
+    '<div class="list-item"><div class="txt">'+esc(r.text)+'<div class="sub">'+esc(r.time||'')+'</div></div>'+
+    (editMode ? '<button class="del" onclick="delItem(\'reminders\',\''+r.id+'\',renderReminders)">✕</button>' : '')+'</div>'
+  ).join('') : '<div class="empty">No reminders yet.</div>';
+  document.getElementById('reminderEditArea').innerHTML = editMode ?
+    '<div class="inline-add"><input id="newRemText" placeholder="e.g. Blood pressure tablet"><input type="time" id="newRemTime" style="max-width:140px;"><button class="btn small teal" onclick="addSimple(\'reminders\',{text:evVal(\'newRemText\'),time:evVal(\'newRemTime\')},renderReminders)">Add</button></div>' : '';
+}
+function renderTodos(){
+  const list = document.getElementById('todoList');
+  list.innerHTML = DATA.todos.length ? DATA.todos.map(t=>
+    '<div class="list-item"><input type="checkbox" class="chk" '+(t.done?'checked':'')+' onchange="toggleTodo(\''+t.id+'\')"><div class="txt '+(t.done?'done':'')+'">'+esc(t.text)+'</div>'+
+    (editMode ? '<button class="del" onclick="delItem(\'todos\',\''+t.id+'\',renderTodos)">✕</button>' : '')+'</div>'
+  ).join('') : '<div class="empty">Nothing on the list yet.</div>';
+  document.getElementById('todoEditArea').innerHTML =
+    '<div class="inline-add"><input id="newTodoText" placeholder="Add a task…" onkeydown="if(event.key===\'Enter\')addTodo()"><button class="btn small teal" onclick="addTodo()">Add</button></div>';
+}
+async function addTodo(){
+  const v = document.getElementById('newTodoText').value.trim(); if(!v) return;
+  DATA.todos.push({id:'t'+Date.now(), text:v, done:false});
+  await saveKey('todos', DATA.todos); renderTodos();
+}
+async function toggleTodo(id){
+  const item = DATA.todos.find(t=>t.id===id); if(item) item.done = !item.done;
+  await saveKey('todos', DATA.todos); renderTodos();
+}
+function renderShopping(){
+  const list = document.getElementById('shoppingList');
+  list.innerHTML = DATA.shopping.length ? DATA.shopping.map(s=>
+    '<div class="list-item"><input type="checkbox" class="chk" '+(s.done?'checked':'')+' onchange="toggleShopping(\''+s.id+'\')"><div class="txt '+(s.done?'done':'')+'">'+esc(s.text)+(s.note?' <span class="sub">('+esc(s.note)+')</span>':'')+'</div>'+
+    (editMode ? '<button class="del" onclick="delItem(\'shopping\',\''+s.id+'\',renderShopping)">✕</button>' : '')+'</div>'
+  ).join('') : '<div class="empty">List is empty.</div>';
+  document.getElementById('shoppingEditArea').innerHTML =
+    '<div class="inline-add"><input id="newShopText" placeholder="Item"><input id="newShopNote" placeholder="Note (optional)"><button class="btn small teal" onclick="addShopping()">Add</button></div>';
+}
+async function addShopping(){
+  const v = document.getElementById('newShopText').value.trim(); if(!v) return;
+  const note = document.getElementById('newShopNote').value.trim();
+  DATA.shopping.push({id:'s'+Date.now(), text:v, note, done:false});
+  await saveKey('shopping', DATA.shopping); renderShopping();
+}
+async function toggleShopping(id){
+  const item = DATA.shopping.find(s=>s.id===id); if(item) item.done = !item.done;
+  await saveKey('shopping', DATA.shopping); renderShopping();
+}
+async function delItem(key, id, renderFn){
+  DATA[key] = DATA[key].filter(x=>x.id!==id);
+  await saveKey(key, DATA[key]); renderFn();
+  if(key==='reminders') sendAppNotification('Appa Connect ❤️','A reminder was removed.');
+}
+async function addSimple(key, obj, renderFn){
+  if(Object.values(obj).some(v=>!v)) return;
+  obj.id = key+Date.now();
+  DATA[key].push(obj);
+  await saveKey(key, DATA[key]); renderFn();
+  if(key==='reminders') sendAppNotification('Appa Connect ❤️','A new reminder was added: '+(obj.text||''));
+  else if(key==='calEvents') sendAppNotification('Appa Connect 📅','Calendar updated: '+(obj.title||''));
+  else if(key==='important') sendAppNotification('Appa Connect 🎂','Important day added: '+(obj.title||''));
+}
+function evVal(id){ return document.getElementById(id).value; }
+
+/* ---------- Food ---------- */
+const foodCats = [['loves','food-loves','foodedit-loves','Add something Appa loves'],
+  ['cook','food-cook','foodedit-cook','Add something you cook together'],
+  ['recipes','food-recipes','foodedit-recipes','Add a recipe name'],
+  ['places','food-places','foodedit-places','Add a place']];
+function renderFood(){
+  foodCats.forEach(([key, listId, editId, placeholder])=>{
+    const arr = DATA.food[key]||[];
+    document.getElementById(listId).innerHTML = arr.length ? arr.map((item,i)=>
+      '<div class="list-item"><div class="txt">'+esc(item)+'</div>'+
+      (editMode ? '<button class="del" onclick="delFood(\''+key+'\','+i+')">✕</button>' : '')+'</div>'
+    ).join('') : '<div class="empty">Nothing added yet.</div>';
+    document.getElementById(editId).innerHTML = editMode ?
+      '<div class="inline-add"><input id="newFood-'+key+'" placeholder="'+placeholder+'"><button class="btn small teal" onclick="addFood(\''+key+'\')">Add</button></div>' : '';
+  });
+}
+async function addFood(key){
+  const el = document.getElementById('newFood-'+key);
+  const v = el.value.trim(); if(!v) return;
+  DATA.food[key] = DATA.food[key]||[]; DATA.food[key].push(v);
+  await saveKey('food', DATA.food); renderFood();
+  sendAppNotification('Appa Connect 🍲','Home & Food was updated.');
+}
+async function delFood(key, idx){
+  DATA.food[key].splice(idx,1);
+  await saveKey('food', DATA.food); renderFood();
+}
+
+/* ---------- Journal ---------- */
+function renderJournal(){
+  const list = document.getElementById('journalList');
+  list.innerHTML = DATA.journal.length ? DATA.journal.slice().reverse().map(j=>
+    '<div class="journal-entry"><div class="je-head"><span>'+fmtDate(j.date)+'</span><span>'+esc(j.tag)+
+    (editMode ? ' · <button class="del" onclick="delItem(\'journal\',\''+j.id+'\',renderJournal)">✕</button>' : '')+'</span></div>'+
+    '<div class="je-body">'+esc(j.text)+'</div></div>'
+  ).join('') : '<div class="empty">Nothing written yet.</div>';
+  document.getElementById('journalEditArea').innerHTML = editMode ?
+    '<div class="card" style="background:var(--paper-dim);"><label>What do you want to tell him?</label><textarea id="newJournalText"></textarea>'+
+    '<label>Tag</label><select id="newJournalTag"><option>Shared</option><option>Private</option><option>Important</option></select>'+
+    '<div style="margin-top:8px;"><button class="btn small teal" onclick="addJournal()">Save entry</button></div></div>' : '';
+}
+async function addJournal(){
+  const text = document.getElementById('newJournalText').value.trim(); if(!text) return;
+  const tag = document.getElementById('newJournalTag').value;
+  DATA.journal.push({id:'j'+Date.now(), date:new Date().toISOString().slice(0,10), text, tag});
+  await saveKey('journal', DATA.journal); renderJournal(); toast('Saved');
+  sendAppNotification('Appa Connect ✉️','A new journal update was added.');
+}
+
+/* ---------- Proud moments ---------- */
+function renderProud(){
+  const list = document.getElementById('proudList');
+  const sorted = DATA.proud.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  list.innerHTML = sorted.length ? sorted.map(p=>
+    '<div class="list-item"><div class="txt">🌱 '+esc(p.title)+' <span class="badge">'+esc(p.who)+'</span><div class="sub">'+fmtDate(p.date)+' — '+esc(p.desc||'')+'</div></div>'+
+    (editMode ? '<button class="del" onclick="delItem(\'proud\',\''+p.id+'\',renderProud)">✕</button>' : '')+'</div>'
+  ).join('') : '<div class="empty">Nothing added yet.</div>';
+  document.getElementById('proudEditArea').innerHTML = editMode ?
+    '<div class="card" style="background:var(--paper-dim);"><label>Title</label><input id="newProudTitle" placeholder="e.g. Finished my research paper">'+
+    '<label>Whose milestone?</label><select id="newProudWho"><option>'+esc(CFG.herName)+'</option><option>'+esc(CFG.fatherName)+'</option><option>Family</option></select>'+
+    '<label>Date</label><input type="date" id="newProudDate"><label>Description</label><textarea id="newProudDesc"></textarea>'+
+    '<div style="margin-top:8px;"><button class="btn small teal" onclick="addProud()">Add</button></div></div>' : '';
+}
+async function addProud(){
+  const title = document.getElementById('newProudTitle').value.trim(); if(!title) return;
+  const who = document.getElementById('newProudWho').value;
+  const date = document.getElementById('newProudDate').value;
+  const desc = document.getElementById('newProudDesc').value.trim();
+  DATA.proud.push({id:'p'+Date.now(), title, who, date, desc});
+  await saveKey('proud', DATA.proud); renderProud(); toast('Added');
+  sendAppNotification('Appa Connect 🌱','A new proud moment was added.');
+}
+
+/* ---------- utils ---------- */
+function esc(s){ return (s||'').toString().replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function fmtDate(d){ if(!d) return ''; const dt=new Date(d); if(isNaN(dt)) return d; return dt.toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'}); }
+function timeAgo(ts){
+  const s = Math.floor((Date.now()-ts)/1000);
+  if(s<60) return 'just now';
+  if(s<3600) return Math.floor(s/60)+'m ago';
+  if(s<86400) return Math.floor(s/3600)+'h ago';
+  return Math.floor(s/86400)+'d ago';
+}
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('service-worker.js').catch(err=>console.error('Service worker registration failed:',err));
+  });
+}
+
+init();
+</script>
+</body>
+</html>

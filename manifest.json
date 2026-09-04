@@ -1,0 +1,10 @@
+{
+  "name": "Appa Connect",
+  "short_name": "Appa Connect",
+  "start_url": "/appa-connect.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#FBF6EC",
+  "theme_color": "#1F5C56",
+  "description": "A private digital space for Appa and family."
+}
