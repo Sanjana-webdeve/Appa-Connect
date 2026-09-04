@@ -1,4 +1,4 @@
-const CACHE_NAME = "appa-connect-v1";
+const CACHE_NAME = "appa-connect-v2";
 
 const FILES_TO_CACHE = [
     "./",
